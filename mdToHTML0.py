@@ -10,6 +10,7 @@ def headReplace(line):
     return '<h'+length+' id="' + content + '">' + content + '</h'+length+'>'
 
 
+
 def bodyAppend(ans):
     return '<body>\n' + ans + '</body>\n'
 
@@ -21,23 +22,34 @@ def htmlAppend(ans):
 def pAppend(line):
     return '<p>' + line + '</p>'
 
+def quoteReplace(all):
+    def replaceResult(segment):
+        ans = re.sub(r'(^|\n)\s*?> (.*)', r'\n<p>\2</p>', segment.group())
+        return '\n<blockquote>'+ans+'</blockquote>'
+    ans = re.sub(r'((^|\n)\s*?> .*)+', replaceResult, all)
+    return ans
 
-def codeSplit(all):
-    ans = []
-    for segment in all:
-        parts = segment.split('```')
-        for index, elem in enumerate(parts):
-            if index % 2 == 1:
-                ans.append(re.sub(
-                    r'(.*?)\n(.*)', r'<pre><code lang="\1">\2</code></pre>', elem, flags=re.DOTALL))
-            else:
-                ans.append(elem)
+
+def listReplace(all):
+    def replaceResult(segment):
+        ans = re.sub(r'(^|\n)\s*?(\+|-) (.*)', r'\n<li>\3</li>', segment.group())
+        return '\n<ul>'+ans+'</ul>'
+    ans = re.sub(r'((^|\n)\s*?(\+|-) .*)+', replaceResult, all)
+    return ans
+
+
+def codeReplace(all):
+    ans = re.sub(r'\s+```(.*?)\n(.*?)```\n',
+                 r'\n<pre><code lang="\1">\2</code></pre>\n', all, flags=re.DOTALL)
     return ans
 
 
 def segmentFliter(all):
-    return codeSplit([all])
-
+    replaced = quoteReplace(listReplace(codeReplace(all)))
+    # ans = re.split(r'\n+(?!([^<]*((?!<pre>|<ul>|<blockquote>)<\w+>|(?!<\/pre>|<\/ul>|<\/blockquote>)<\/\w+>))*[^<]*(<\/pre>|<\/ul>|<\/blockquote>))', replaced)
+    ans = re.findall(r'<(?:pre|ul|blockquote)>[\s\S]*?<\/(?:pre|ul|blockquote)>|\n|.+', replaced)
+    result = ['' if i == '\n' else i for i in ans]
+    return result
 
 def wordFilter(line):
     def boldReplace(line):
@@ -50,8 +62,6 @@ def wordFilter(line):
 
 
 def lineFilter(line):
-    if line.strip(' ') == '':
-        return ''
     head = headReplace(line)
     if head:
         return head
@@ -64,14 +74,12 @@ def main():
 
     ans = []
     for segment in segmentFliter(raw):
-        if segment.startswith('<pre'):
+        if segment.startswith('<pre>') or segment=='':
             ans.append(segment)
+        elif segment.startswith('<ul>') or segment.startswith('<blockquote>'):
+            ans.append(wordFilter(segment))
         else:
-            for line in segment.split('\n'):
-                if line != '':
-                    ans.append(lineFilter(wordFilter(line)))
-                else:
-                    ans.append('')
+            ans.append(lineFilter(wordFilter(segment)))
 
     out = htmlAppend(bodyAppend('\n'.join(ans)))
     outputFile = open('test.html', 'w', encoding='utf-8')
@@ -79,12 +87,3 @@ def main():
 
 
 main()
-# print(segmentFliter(
-#     '''
-# A
-# ```
-# 1+2
-# ```
-# B
-# '''
-# ))
