@@ -2,13 +2,12 @@ import re
 
 
 def headReplace(line):
-    heads = re.match(r'^(#{1,6}) (.*)',line)
+    heads = re.match(r'^(#{1,6}) (.*)', line)
     if not heads:
         return None
     length = str(len(heads.group(1)))
     content = heads.group(2)
     return '<h'+length+' id="' + content + '">' + content + '</h'+length+'>'
-
 
 
 def bodyAppend(ans):
@@ -22,19 +21,16 @@ def htmlAppend(ans):
 def pAppend(line):
     return '<p>' + line + '</p>'
 
+
 def quoteReplace(all):
-    def replaceResult(segment):
-        ans = re.sub(r'(^|\n)\s*?> (.*)', r'\n<p>\2</p>', segment.group())
-        return '\n<blockquote>'+ans+'</blockquote>'
-    ans = re.sub(r'((^|\n)\s*?> .*)+', replaceResult, all)
+    addBlockquote = re.sub(r'((^|\n)\s*?> .*)+', r'\n<blockquote>\n\0\n</blockquote>', all)
+    ans = re.sub(r'(^|\n)\s*?> (.*)', r'\n<p>\2</p>', addBlockquote)
     return ans
 
 
 def listReplace(all):
-    def replaceResult(segment):
-        ans = re.sub(r'(^|\n)\s*?(\+|-) (.*)', r'\n<li>\3</li>', segment.group())
-        return '\n<ul>'+ans+'</ul>'
-    ans = re.sub(r'((^|\n)\s*?(\+|-) .*)+', replaceResult, all)
+    addUL = re.sub(r'((^|\n)\s*?(\+|-) .*)+', r'\n<ul>\n\0\n</ul>', all)
+    ans = re.sub(r'(^|\n)\s*?(\+|-) (.*)', r'\n<li>\3</li>', addUL)
     return ans
 
 
@@ -47,9 +43,11 @@ def codeReplace(all):
 def segmentFliter(all):
     replaced = quoteReplace(listReplace(codeReplace(all)))
     # ans = re.split(r'\n+(?!([^<]*((?!<pre>|<ul>|<blockquote>)<\w+>|(?!<\/pre>|<\/ul>|<\/blockquote>)<\/\w+>))*[^<]*(<\/pre>|<\/ul>|<\/blockquote>))', replaced)
-    ans = re.findall(r'<(?:pre|ul|blockquote)>[\s\S]*?<\/(?:pre|ul|blockquote)>|\n|.+', replaced)
+    ans = re.findall(
+        r'<(?:pre|ul|blockquote)>[\s\S]*?<\/(?:pre|ul|blockquote)>|\n|.+', replaced)
     result = ['' if i == '\n' else i for i in ans]
     return result
+
 
 def wordFilter(line):
     def boldReplace(line):
@@ -74,7 +72,7 @@ def main():
 
     ans = []
     for segment in segmentFliter(raw):
-        if segment.startswith('<pre>') or segment=='':
+        if segment.startswith('<pre>') or segment == '':
             ans.append(segment)
         elif segment.startswith('<ul>') or segment.startswith('<blockquote>'):
             ans.append(wordFilter(segment))
