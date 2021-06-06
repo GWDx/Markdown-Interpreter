@@ -23,30 +23,30 @@ string listReplace(string all){
     //ans = re.sub(r'(^|\n)\s*?(\+|-) (.*)', r'\n<li>\3</li>', addUL)
     regex r1("((^|\\n)\\s*?(\\+|-) .*)+");
     regex r2("(^|\\n)\\s*?(\\+|-) (.*)");
-	string addUL = regex_replace(all,r1,"\\n<ul>\\n\\0\\n</ul>");
-	string ans = regex_replace(addUL,r2,"\\n<li>\\3</li>");
+    string addUL = regex_replace(all,r1,"\\n<ul>\\n\\0\\n</ul>");
+    string ans = regex_replace(addUL,r2,"\\n<li>\\3</li>");
     return ans;
 }
 
 string codeReplace(string all){
-	//ans = re.sub(r'\s+```(.*?)\n(.*?)```\n',r'\n<pre><code lang="\1">\2</code></pre>\n', all)
-	regex r1("\\s+```(.*?)\\n(.*?)```\\n");
-	string ans = regex_replace(all,r1,"\\n<pre><code lang="\\1">\\2</code></pre>\\n");
+    //ans = re.sub(r'\s+```(.*?)\n(.*?)```\n',r'\n<pre><code lang="\1">\2</code></pre>\n', all)
+    regex r1("\\s+```(.*?)\\n(.*?)```\\n");
+    string ans = regex_replace(all,r1,"\\n<pre><code lang="\\1">\\2</code></pre>\\n");
     return ans;	
 }
     
 string quoteReplace(string all){
-	//addBlockquote = re.sub(r'((^|\n)\s*?> .*)+', r'\n<blockquote>\n\0\n</blockquote>', all)
-	//ans = re.sub(r'(^|\n)\s*?> (.*)', r'\n<p>\2</p>', addBlockquote)
-	regex r1("((^|\\n)\\s*?> .*)+");
+    //addBlockquote = re.sub(r'((^|\n)\s*?> .*)+', r'\n<blockquote>\n\0\n</blockquote>', all)
+    //ans = re.sub(r'(^|\n)\s*?> (.*)', r'\n<p>\2</p>', addBlockquote)
+    regex r1("((^|\\n)\\s*?> .*)+");
     regex r2("(^|\\n)\\s*?> (.*)");
-	string addBlockquote = regex_replace(all,r1,"\\n<blockquote>\\n\\0\\n</blockquote>");
-	string ans = regex_replace(addBlockquote,r2,"\\n<p>\\2</p>");
+    string addBlockquote = regex_replace(all,r1,"\\n<blockquote>\\n\\0\\n</blockquote>");
+    string ans = regex_replace(addBlockquote,r2,"\\n<p>\\2</p>");
     return ans;
 }  
 string boldReplace(string line){
-	regex r1("\\*\\*(.+?)\\*\\*");
-	string ans = regex_replace(line,r1,"<b>\\1</b>");
+    regex r1("\\*\\*(.+?)\\*\\*");
+    string ans = regex_replace(line,r1,"<b>\\1</b>");
     return ans;	
 }
 
