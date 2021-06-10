@@ -1,11 +1,11 @@
 /*
 File: Markdown to HTML
-Author: PB19030888-ÕÅÊæºã 
-Time£º2021/6/9 
-Function: ±êÌâ,·Ö¸îÏß,ÁĞ±í,ĞŞÊÎ,Í¼Æ¬,Á´½Ó,Ãªµã,ÒıÓÃ,´úÂë,±í¸ñ,Ä¿Â¼ 
+Author: PB19030888-å¼ èˆ’æ’
+Timeï¼š2021/6/9
+Function: æ ‡é¢˜,åˆ†å‰²çº¿,åˆ—è¡¨,ä¿®é¥°,å›¾ç‰‡,é“¾æ¥,é”šç‚¹,å¼•ç”¨,ä»£ç ,è¡¨æ ¼,ç›®å½•
 Compiler: gcc 4.9.2
 Compile Order: -std=c++11
-*/ 
+*/
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -17,14 +17,14 @@ class transform{
 public:
     void outputMarkdown(std::vector<std::string> & dests);
     void setTitle(std::string title);
-    
+
     int run(std::vector<std::string>& content);
     int getContent(std::vector<std::string>& content);
     void printContent();
     int translate();
 private:
     std::string ContentTitle;
-    
+
     enum All_Statue{
         INCODE,
         NORMAL,
@@ -32,14 +32,14 @@ private:
         INTABLE,
         TABLE_FMT
     } status;
-    
+
     std::string preReplace(std::string s);
     std::string getTime();
-    
+
     std::vector<std::string> content;
     size_t contentLength;
     std::vector<std::string> output;
-    
+
     int isToc(std::string s);
     std::string TocContent;
     struct Toc{int deep; std::string name;};
@@ -48,45 +48,45 @@ private:
     std::vector<struct Toc> Tocs;
     std::vector<std::string> TocString;
     void handleToc();
-    
-    bool needMathjax = 0;//latex¹«Ê½£¬»¹Î´ÊµÏÖ 
-    
+
+    bool needMathjax = 0;//latexå…¬å¼ï¼Œè¿˜æœªå®ç°
+
     int isTitle(std::string s);
     int isHorizon(std::string s);
-    
+
     std::string handleTitle(std::string s,int titleLevel);
     std::string handleHorizon();
-    
+
     void handleUnList();
     int isUnList(std::string s);
-    
+
     void handleList();
     int isList(std::string s);
-    
+
     int BlockNumber = 0;
     int isBlock(std::string s);
-    
+
     int handleBlock(std::string s);
-    
+
     int isBr(std::string s);
-    
+
     int isCode(std::string s);
     void handletoken();
-    
+
     int handleCode(std::string s);
-    
+
     int TableNumber = 0;
     std::vector<std::string> aligns;
     int handleTable(std::string s);
     std::vector<std::string> getTableElem(std::string s);
-    
+
     void handleFlow();
 };
-//»ñÈ¡ÎÄ¼şÃû 
+//è·å–æ–‡ä»¶å
 void transform::setTitle(std::string title){
     ContentTitle = title;
 }
-//µ±Ç°Ê±¼ä 
+//å½“å‰æ—¶é—´
 std::string transform::getTime(){
     time_t timep;
     time (&timep);
@@ -94,7 +94,7 @@ std::string transform::getTime(){
     strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S",localtime(&timep) );
     return tmp;
 }
-//ÔËĞĞ 
+//è¿è¡Œ
 int transform::run(std::vector<std::string>& content){
     for(int i = 0;i < 10;++i){
         aligns.push_back("center");
@@ -110,7 +110,7 @@ int transform::run(std::vector<std::string>& content){
     output.push_back("</style>");
     output.push_back("<meta charset=\"utf-8\"/>");
     output.push_back("</head>");
-    output.push_back("<body>");   
+    output.push_back("<body>");
     translate();
     if(needToc == true){
         handleToc();
@@ -123,34 +123,34 @@ int transform::run(std::vector<std::string>& content){
     output.push_back("</html>");
     return 0;
 }
-//¶ÁÈë 
+//è¯»å…¥
 int transform::getContent(std::vector<std::string>& content){
     this->content = content;
     contentLength = content.size();
     return 0;
 }
-//±ê×¼Êä³ö 
+//æ ‡å‡†è¾“å‡º
 void transform::printContent(){
-    for(auto v : output){ //auto×ÔÊÊÓ¦ÀàĞÍ 
+    for(auto v : output){ //autoè‡ªé€‚åº”ç±»å‹
         std::cout<<v<<std::endl;
     }
 }
-//Êä³öMarkdown
+//è¾“å‡ºMarkdown
 void transform::outputMarkdown(std::vector<std::string> & dests){
     for(auto v : output){
         dests.push_back(v);
     }
 }
-//×ª»»µÄÖ÷Ìå²¿·Ö 
+//è½¬æ¢çš„ä¸»ä½“éƒ¨åˆ†
 int transform::translate(){
     handletoken();
     handleUnList();
     handleList();
-    handleFlow(); 
+    handleFlow();
     for(auto s : content){
         if(needToc == 0) isToc(s);
         auto titleLevel = isTitle(s);
-        
+
         if(handleBlock(s) == 1){}
         else if(handleCode(s) == 1){}
         else if(handleTable(s) == 1){}
@@ -158,7 +158,7 @@ int transform::translate(){
             output.push_back(handleTitle(s, titleLevel));
         }else if(isHorizon(s)){
             output.push_back(handleHorizon());
-        
+
         }else if(isBr(s)){
             output.push_back("<br />");
         }else{
@@ -167,7 +167,7 @@ int transform::translate(){
     }
     return 0;
 }
-//ÅĞ¶Ï±êÌâ 
+//åˆ¤æ–­æ ‡é¢˜
 int transform::isTitle(std::string s){
     auto titleLevel = 0;
     if(s.empty()){
@@ -182,18 +182,18 @@ int transform::isTitle(std::string s){
     }
     return titleLevel;
 }
-//´¦Àí±êÌâ
+//å¤„ç†æ ‡é¢˜
 std::string transform::handleTitle(std::string s, int titleLevel){
-    auto name = s.substr(titleLevel + 1);   //ÇĞ³ı##......»ñÈ¡±êÌâÃû 
-    auto tem = "<a name=\""+ name +"\"></a>";   //ÉèÖÃÃªµã 
-    tem += "<h"+std::to_string(titleLevel)+">"+  name +"</h"+std::to_string(titleLevel)+">"; //°Ñint×ª³Éstring 
-    Tocs.push_back(Toc{titleLevel,name});   //±êÌâ¼ÇÂ¼µ½Ä¿Â¼ÏòÁ¿ÀïÃæ 
+    auto name = s.substr(titleLevel + 1);   //åˆ‡é™¤##......è·å–æ ‡é¢˜å
+    auto tem = "<a name=\""+ name +"\"></a>";   //è®¾ç½®é”šç‚¹
+    tem += "<h"+std::to_string(titleLevel)+">"+  name +"</h"+std::to_string(titleLevel)+">"; //æŠŠintè½¬æˆstring
+    Tocs.push_back(Toc{titleLevel,name});   //æ ‡é¢˜è®°å½•åˆ°ç›®å½•å‘é‡é‡Œé¢
     return tem;
 }
-//ÅĞ¶Ï·Ö¸îÏß 
+//åˆ¤æ–­åˆ†å‰²çº¿
 int transform::isHorizon(std::string s){
-    std::regex e1("^[-*]{3,}$");  //-»ò*Æ¥Åä3´ÎÒÔÉÏ 
-    std::smatch sm;         //¼ÇÂ¼Æ¥Åä½á¹û 
+    std::regex e1("^[-*]{3,}$");  //-æˆ–*åŒ¹é…3æ¬¡ä»¥ä¸Š
+    std::smatch sm;         //è®°å½•åŒ¹é…ç»“æœ
     std::regex_match (s,sm,e1);
     if(sm.size() != 0){
         return 1;
@@ -201,26 +201,26 @@ int transform::isHorizon(std::string s){
         return 0;
     }
 }
-//´¦Àí·Ö¸îÏß 
+//å¤„ç†åˆ†å‰²çº¿
 std::string transform::handleHorizon(){
     return "<hr>";
 }
-//ÅĞ¶ÏÎŞĞòÁĞ±í 
+//åˆ¤æ–­æ— åºåˆ—è¡¨
 int transform::isUnList(std::string s){
-    if(s.empty()){    //ÅĞ¿Õ 
+    if(s.empty()){    //åˆ¤ç©º
         return 0;
     }
     auto idx = 0;
     while(s[idx] == ' ') ++idx;
     if(s[idx] == '+' || s[idx] == '-' || s[idx] == '*'){
         ++idx;
-        if(idx < s.size() && s[idx] == ' '){  //ºóÃæ±ØĞëÊÇÒ»¸ö¿Õ¸ñ 
-            return idx;                        //·µ»ØÁĞ±íÃû¿ªÊ¼µÄÎ»ÖÃ 
+        if(idx < s.size() && s[idx] == ' '){  //åé¢å¿…é¡»æ˜¯ä¸€ä¸ªç©ºæ ¼
+            return idx;                        //è¿”å›åˆ—è¡¨åå¼€å§‹çš„ä½ç½®
         }
     }
     return 0;
 }
-//´¦ÀíÎŞĞòÁĞ±í 
+//å¤„ç†æ— åºåˆ—è¡¨
 void transform::handleUnList(){
     auto ii = 0,top = 0;
     std::stack<int> stack;
@@ -229,10 +229,10 @@ void transform::handleUnList(){
     for(auto i = 0; i < content.size();++i){
         top = stack.top();
         std::string s = content[i];
-        ii = isUnList(s); //ÅĞ¶ÏÎŞĞòÁĞ±í  
-        if(ii <= 0){   //²»ÊÇÁĞ±í 
+        ii = isUnList(s); //åˆ¤æ–­æ— åºåˆ—è¡¨
+        if(ii <= 0){   //ä¸æ˜¯åˆ—è¡¨
             temp = "";
-            while(ii < top){ //ËùÓĞÔªËØ³öÕ» 
+            while(ii < top){ //æ‰€æœ‰å…ƒç´ å‡ºæ ˆ
                 temp += "</ul>";
                 stack.pop();
                 top = stack.top();
@@ -241,30 +241,30 @@ void transform::handleUnList(){
             content[i] = temp;
             continue;
         }
-        if(ii > stack.top()){ //¿ªÆôÏÂÒ»¼¶ÁĞ±í 
+        if(ii > stack.top()){ //å¼€å¯ä¸‹ä¸€çº§åˆ—è¡¨
             temp = "<ul><li>" + s.substr(ii + 1) + "</li>";
             stack.push(ii);
-        }else if(ii == stack.top()){ //¼ÌĞøµ±Ç°¼¶±ğµÄÁĞ±í 
+        }else if(ii == stack.top()){ //ç»§ç»­å½“å‰çº§åˆ«çš„åˆ—è¡¨
             temp = "<li>" + s.substr(ii + 1) + "</li>";
-        }else{  //ÊÇÁĞ±íµ«ÊÇ±Èµ±Ç°¼¶±ğµÄÁĞ±íµÍ 
+        }else{  //æ˜¯åˆ—è¡¨ä½†æ˜¯æ¯”å½“å‰çº§åˆ«çš„åˆ—è¡¨ä½
             temp = "";
-            while(ii < top){  //ÍË³ö¸ß¼¶±ğÁĞ±í 
+            while(ii < top){  //é€€å‡ºé«˜çº§åˆ«åˆ—è¡¨
                 temp += "</ul>";
                 stack.pop();
                 top = stack.top();
             }
-            if(ii > stack.top()){ //¿ªÆôÏÂÒ»¼¶ÁĞ±í  
+            if(ii > stack.top()){ //å¼€å¯ä¸‹ä¸€çº§åˆ—è¡¨
                 temp += "<ul><li>" + s.substr(ii + 1) + "</li>";
                 stack.push(ii);
-            }else if(ii == stack.top()){  //¼ÌĞøµ±Ç°¼¶±ğµÄÁĞ±í 
+            }else if(ii == stack.top()){  //ç»§ç»­å½“å‰çº§åˆ«çš„åˆ—è¡¨
                 temp += "<li>" + s.substr(ii + 1) + "</li>";
             }
         }
         content[i] = temp;
     }
 }
-//ÓĞĞòÁĞ±í 
-void transform::handleList(){  //Í¬ÀíÎŞĞòÁĞ±í 
+//æœ‰åºåˆ—è¡¨
+void transform::handleList(){  //åŒç†æ— åºåˆ—è¡¨
     auto ii = 0,top = 0;
     std::stack<int> stack;
     stack.push(0);
@@ -306,49 +306,49 @@ void transform::handleList(){  //Í¬ÀíÎŞĞòÁĞ±í
         content[i] = temp;
     }
 }
-//ÅĞ¶ÏÓĞĞòÁĞ±í 
+//åˆ¤æ–­æœ‰åºåˆ—è¡¨
 int transform::isList(std::string s){
-    std::regex e("^\\s*\\d+\\.\\s.+");//\s¿Õ¸ñ£¬\dÒ»¸öÊı×Ö£¬+Æ¥ÅäÒ»´Î¼°ÒÔÉÏ£¬*Æ¥Åä0´Î¼°ÒÔÉÏ£¬.ÈÎÒâ×Ö·û 
+    std::regex e("^\\s*\\d+\\.\\s.+");//\sç©ºæ ¼ï¼Œ\dä¸€ä¸ªæ•°å­—ï¼Œ+åŒ¹é…ä¸€æ¬¡åŠä»¥ä¸Šï¼Œ*åŒ¹é…0æ¬¡åŠä»¥ä¸Šï¼Œ.ä»»æ„å­—ç¬¦
     std::smatch sm;
     std::regex_match (s,sm,e);
     if(sm.size() != 0){
         auto idx = 0;
         while(s[idx] == ' ') ++idx;
-        while(isdigit(s[idx])) ++idx; //isdigitÅĞ¶ÏÊı×Ö 
-        return ++idx;  //·µ»ØÁĞ±íÃû¿ªÊ¼Î»ÖÃ 
+        while(isdigit(s[idx])) ++idx; //isdigitåˆ¤æ–­æ•°å­—
+        return ++idx;  //è¿”å›åˆ—è¡¨åå¼€å§‹ä½ç½®
     }else{
         return 0;
     }
 }
 
-//ÅĞ¶ÏÒıÓÃ 
+//åˆ¤æ–­å¼•ç”¨
 int transform::isBlock(std::string s){
-    std::regex e1("^>*\\s+.*");//Æ¥Åä>ºÍ¿Õ¸ñ 
+    std::regex e1("^>*\\s+.*");//åŒ¹é…>å’Œç©ºæ ¼
     std::smatch sm;
     std::regex_match (s,sm,e1);
     if(sm.size()  != 0){
         auto idx = 0;
         while(s[idx] == '>') idx++;
-        return idx;   //·µ»Ø¼¸¼¶ÒıÓÃ
+        return idx;   //è¿”å›å‡ çº§å¼•ç”¨
     }else{
         return 0;
     }
 }
 
-//´¦ÀíÒıÓÃ 
+//å¤„ç†å¼•ç”¨
 int transform::handleBlock(std::string s){
-    
+
     int CorNumber = isBlock(s);
     std::string result = "";
-    
+
     if(status == NORMAL && CorNumber >= 1){
-        status = INBLOCK;    //½øÈëINBLOCKÄ£Ê½ 
-        while(BlockNumber < CorNumber){ //BlockNumber¼ÇÂ¼µ±Ç°ÊÇ¼¸¼¶ÒıÓÃ 
+        status = INBLOCK;    //è¿›å…¥INBLOCKæ¨¡å¼
+        while(BlockNumber < CorNumber){ //BlockNumberè®°å½•å½“å‰æ˜¯å‡ çº§å¼•ç”¨
             BlockNumber ++;
             result += "<blockquote>";
         }
-        result += s.substr(CorNumber); //È¥³ıÇ°ÃæµÄ> 
-        result += "<br />";//¼ÓÈë»»ĞĞ 
+        result += s.substr(CorNumber); //å»é™¤å‰é¢çš„>
+        result += "<br />";//åŠ å…¥æ¢è¡Œ
         output.push_back(result);
         return 1;
     }else if(status == INBLOCK){
@@ -358,14 +358,14 @@ int transform::handleBlock(std::string s){
                 result += "<blockquote>";
             }
         }else if(CorNumber < BlockNumber){
-            while(BlockNumber > CorNumber){ //ÍË³öµ±Ç°¼¶±ğÒıÓÃ 
+            while(BlockNumber > CorNumber){ //é€€å‡ºå½“å‰çº§åˆ«å¼•ç”¨
                 BlockNumber --;
                 result += "</blockquote>";
             }
         }
-        result += s.substr(CorNumber); //È¥³ıÇ°ÃæµÄ>
-        result += "<br />"; //¼ÓÈë»»ĞĞ 
-        if(BlockNumber <= 0){  //ÒıÓÃ½áÊø£¬·µ»ØNORMAL×´Ì¬ 
+        result += s.substr(CorNumber); //å»é™¤å‰é¢çš„>
+        result += "<br />"; //åŠ å…¥æ¢è¡Œ
+        if(BlockNumber <= 0){  //å¼•ç”¨ç»“æŸï¼Œè¿”å›NORMALçŠ¶æ€
             status = NORMAL;
             BlockNumber = 0;
         }
@@ -375,25 +375,25 @@ int transform::handleBlock(std::string s){
     return 0;
 }
 
-//Ò»Ğ©³öÏÖµÄ×Ö·ûÌæ»» 
+//ä¸€äº›å‡ºç°çš„å­—ç¬¦æ›¿æ¢
 void transform::handletoken(){
     std::string temp,temp2;
     std::regex re_lt("<");
     std::regex re_and("&");
     std::regex re_link("\\[(.*)\\]\\((.*)\\)");//[]()
-    std::regex re_sup("\\[(.*)\\]\\[(.*)\\]");//[][]½Ç±ê 
+    std::regex re_sup("\\[(.*)\\]\\[(.*)\\]");//[][]è§’æ ‡
     std::regex re_img("!\\[(.*)\\]\\((.*)\\)");//![]()
-    std::regex re_i("\\*([^\\*]+)\\*");//* *Ğ±Ìå 
-    std::regex re_S("\\~\\~([^\\~\\~]+)\\~\\~");//É¾³ıÏß 
-    std::regex re_b("\\*\\*([^\\*\\*]+)\\*\\*");//** **¼Ó´Ö 
-    std::regex re_m("\\$([^\\$]*)\\$");//latex¹«Ê½ 
-    std::regex re_code("```(.*)```");//´úÂë 
+    std::regex re_i("\\*([^\\*]+)\\*");//* *æ–œä½“
+    std::regex re_S("\\~\\~([^\\~\\~]+)\\~\\~");//åˆ é™¤çº¿
+    std::regex re_b("\\*\\*([^\\*\\*]+)\\*\\*");//** **åŠ ç²—
+    std::regex re_m("\\$([^\\$]*)\\$");//latexå…¬å¼
+    std::regex re_code("```(.*)```");//ä»£ç 
     std::smatch sm;
     for(int i = 0; i < content.size(); ++i){
         temp = content[i];
-        temp.insert(temp.begin(), ' ');//×îÇ°²åÈëÒ»¸ö¿Õ¸ñ 
+        temp.insert(temp.begin(), ' ');//æœ€å‰æ’å…¥ä¸€ä¸ªç©ºæ ¼
         temp2.clear();
-        std::regex_replace(std::back_inserter(temp2),temp.begin(),temp.end(),re_and,"&amp;"); //std::back_inserter¿ÉÒÔ¶¯Ì¬À©Èİ 
+        std::regex_replace(std::back_inserter(temp2),temp.begin(),temp.end(),re_and,"&amp;"); //std::back_inserterå¯ä»¥åŠ¨æ€æ‰©å®¹
         temp.clear();
         std::regex_replace(std::back_inserter(temp),temp2.begin(),temp2.end(),re_lt,"&lt;");
         temp2.clear();
@@ -418,14 +418,14 @@ void transform::handletoken(){
         if(sm.size() > 0){
             needMathjax = 1;
         }
-        temp2.erase(temp2.begin()); //É¾³ı×îÇ°ÃæµÄ¿Õ¸ñ 
+        temp2.erase(temp2.begin()); //åˆ é™¤æœ€å‰é¢çš„ç©ºæ ¼
         content[i] = temp2;
     }
 }
 
-//ÅĞ¶Ï»»ĞĞ 
+//åˆ¤æ–­æ¢è¡Œ
 int transform::isBr(std::string s){
-    std::regex re_br("^[\\s\\t]*$"); //Æ¥Åä¿Õ¸ñ»òÕßtab
+    std::regex re_br("^[\\s\\t]*$"); //åŒ¹é…ç©ºæ ¼æˆ–è€…tab
     std::smatch sm;
     std::regex_match(s,sm,re_br);
     if(sm.size() > 0){
@@ -436,7 +436,7 @@ int transform::isBr(std::string s){
 }
 
 
-//´úÂë 
+//ä»£ç 
 int transform::handleCode(std::string s){
     std::regex re_Code("^\\s*```\\s*[a-zA-Z1-9\\+\\.]*\\s*$");
     std::regex re_s("\\s");
@@ -444,25 +444,25 @@ int transform::handleCode(std::string s){
     std::smatch sm;
     std::regex_match(s, sm, re_Code);
     std::string temp,temp2;
-    if(status == NORMAL && sm.size() > 0){  //status¼ÇÂ¼×´Ì¬Ìø×ª 
-        status = INCODE;                    //½øÈëINCODE×´Ì¬ 
+    if(status == NORMAL && sm.size() > 0){  //statusè®°å½•çŠ¶æ€è·³è½¬
+        status = INCODE;                    //è¿›å…¥INCODEçŠ¶æ€
         output.push_back("<code> <pre>");
         return 1;
     }else if(status == INCODE && sm.size() > 0){
-        status = NORMAL;                    //³öINCODE×´Ì¬£¬»ØNORMAL×´Ì¬ 
+        status = NORMAL;                    //å‡ºINCODEçŠ¶æ€ï¼Œå›NORMALçŠ¶æ€
         output.push_back("</pre></code>");
         return 1;
     }else if(status == INCODE){
-        std::regex_replace(std::back_inserter(temp),s.begin(),s.end(),re_s,"&nbsp"); //Ìæ»»¿Õ¸ñ 
-        std::regex_replace(std::back_inserter(temp2),temp.begin(),temp.end(),re_t,"&nbsp&nbsp&nbsp&nbsp"); //Ìæ»»tab 
-        temp="<span>"+temp2+"</span><br />";//spanÊÇÓÃÀ´Éú³ÉÑùÊ½µÄ£¬MarkdownËÆºõÃ»ÓĞÕâ¸ö¹¦ÄÜ£¬ËùÒÔstyleÔİÇÒÃ»Ğ´ 
+        std::regex_replace(std::back_inserter(temp),s.begin(),s.end(),re_s,"&nbsp"); //æ›¿æ¢ç©ºæ ¼
+        std::regex_replace(std::back_inserter(temp2),temp.begin(),temp.end(),re_t,"&nbsp&nbsp&nbsp&nbsp"); //æ›¿æ¢tab
+        temp="<span>"+temp2+"</span><br />";//spanæ˜¯ç”¨æ¥ç”Ÿæˆæ ·å¼çš„ï¼ŒMarkdownä¼¼ä¹æ²¡æœ‰è¿™ä¸ªåŠŸèƒ½ï¼Œæ‰€ä»¥styleæš‚ä¸”æ²¡å†™
         output.push_back(temp);
         return 1;
     }else{
         return 0;
     }
 }
-//±í¸ñ 
+//è¡¨æ ¼
 int transform::handleTable(std::string s){
     std::regex re_Table("\\|(.*)\\|");
     std::regex re_rep("\\|");
@@ -527,9 +527,9 @@ std::vector<std::string> transform::getTableElem(std::string s){
     result.erase(result.begin());
     return result;
 }
-//ÅĞ¶ÏÄ¿Â¼ 
+//åˆ¤æ–­ç›®å½•
 int transform::isToc(std::string s){
-    std::regex re_toc("\\[TOC\\]"); //[ĞèÒª×ªÒå 
+    std::regex re_toc("\\[TOC\\]"); //[éœ€è¦è½¬ä¹‰
     std::smatch sm;
     std::regex_search(s,sm,re_toc);
     if(sm.size() > 0){
@@ -539,16 +539,16 @@ int transform::isToc(std::string s){
     }
     return 0;
 }
-//´¦ÀíÄ¿Â¼ 
+//å¤„ç†ç›®å½•
 void transform::handleToc(){
     auto deep = 0;
-    auto TocPosition = std::find(output.begin(),output.end(),TocContent); //ËÑË÷TOCÎ»ÖÃ 
-    if(TocPosition == output.end()){ //Î´ÕÒµ½ 
+    auto TocPosition = std::find(output.begin(),output.end(),TocContent); //æœç´¢TOCä½ç½®
+    if(TocPosition == output.end()){ //æœªæ‰¾åˆ°
         return;
     }
-    for(auto list : Tocs){  //Ïàµ±ÓÚÕ»£¬¼´n¼¶±êÌâºóÓÚn-1¼¶±êÌâÈëÕ»£¬n¼¶±êÌâÏÈÓÚn-1¼¶±êÌâ³öÕ»£¬ 
+    for(auto list : Tocs){  //ç›¸å½“äºæ ˆï¼Œå³nçº§æ ‡é¢˜åäºn-1çº§æ ‡é¢˜å…¥æ ˆï¼Œnçº§æ ‡é¢˜å…ˆäºn-1çº§æ ‡é¢˜å‡ºæ ˆï¼Œ
         if(list.deep > deep){
-            while(deep < list.deep){ //deepÊÇµ±Ç°´¦ÓÚ¼¸¼¶±êÌâ 
+            while(deep < list.deep){ //deepæ˜¯å½“å‰å¤„äºå‡ çº§æ ‡é¢˜
                 TocString.push_back("<ol style = \"line-height:80%\">");
                 deep ++;
             }
@@ -563,44 +563,44 @@ void transform::handleToc(){
             TocString.push_back("<li> <a href=\"#"+list.name+"\">"+list.name+"</a> </li>");
         }
     }
-    while(deep > 0){  //Õ»ÖĞ»¹ÓĞÔªËØµÄ»°È«³öÕ» 
+    while(deep > 0){  //æ ˆä¸­è¿˜æœ‰å…ƒç´ çš„è¯å…¨å‡ºæ ˆ
         TocString.push_back("</ol>");
         deep --;
     }
-    for(int ii = static_cast<int>(TocString.size()) - 1; ii >= 0; ii--){ //µ¹Ğò²åÈë 
+    for(int ii = static_cast<int>(TocString.size()) - 1; ii >= 0; ii--){ //å€’åºæ’å…¥
         output.insert(TocPosition + 1, TocString[ii]);
     }
 }
 
-//Á÷³ÌÍ¼ 
+//æµç¨‹å›¾
 void transform::handleFlow(){
-  
+
 }
 
 int main() {
-    std::unique_ptr<transform> transform_init(new transform);//²ÉÓÃstd::unique_ptr·ÀÖ¹ÄÚ´æĞ¹Â© 
+    std::unique_ptr<transform> transform_init(new transform);//é‡‡ç”¨std::unique_ptré˜²æ­¢å†…å­˜æ³„æ¼
     std::vector<std::string> cmds;
     std::vector<std::string> c;
     std::vector<std::string> outputs;
     std::string buff;
-    std::string from = "test.txt";
+    std::string from = "test.md";
     std::string dest = "out.html";
     std::ifstream file;
-    file.open(from);   //´ò¿ªÎÄ¼ş 
+    file.open(from);   //æ‰“å¼€æ–‡ä»¶
     if(!file){
         std::cout<<"Error file\t" + from<<std::endl;
         return -1;
     }
-    while(getline(file,buff)){  //¶ÁÈëÎÄ¼ş 
+    while(getline(file,buff)){  //è¯»å…¥æ–‡ä»¶
         c.push_back(buff);
     }
     c.push_back("");
-    transform_init->setTitle(from); //»ñÈ¡ÎÄ¼şÃû 
+    transform_init->setTitle(from); //è·å–æ–‡ä»¶å
     transform_init->getContent(c);
     transform_init->run(c);
     transform_init->outputMarkdown(outputs);
-    
-    std::ofstream out; //Êä³öÎÄ¼ş 
+
+    std::ofstream out; //è¾“å‡ºæ–‡ä»¶
     out.open(dest);
     for(auto s:outputs){
         out<<s<<std::endl;
