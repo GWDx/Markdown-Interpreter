@@ -9,9 +9,8 @@ string lineFilter(string line) {
 
 string headReplace(string line) {
     // re.match(r'^(#{1,6}) (.*)', line)
-    regex r1("(#{1,6}) (.+)");
     std::smatch result;
-    bool matched = std::regex_match(line, result, r1);
+    bool matched = std::regex_match(line, result, regex("(#{1,6}) (.+)"));
     if (!matched)
         return "";
     string length = std::to_string(result[1].length());

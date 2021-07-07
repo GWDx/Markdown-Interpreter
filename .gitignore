@@ -1,5 +1,9 @@
 .vscode
 bin
 learn
+prevCode
 *.exe
 *.bat
+src/test*
+src/__pycache__
+src/config.json

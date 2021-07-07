@@ -37,9 +37,9 @@ void readArg(int argc, char **argv, bool &print, string &inFileName, string &out
     }
 
     smatch regexResult1, regexResult2;
-    bool exactOutFile = regex_search(arg, regexResult2, regex("-o (\\S+)"));
-    string removeOutFile = regex_replace(arg, regex("(.*)-o \\S+(.*)"), "$1$2");
-    bool exactInFile = regex_search(removeOutFile, regexResult1, regex(" ([^- ]+)"));
+    bool exactOutFile = regex_search(arg, regexResult2, regex(" -o (\\S+) "));
+    string removeOutFile = regex_replace(arg, regex("(.*) -o \\S+ (.*)"), "$1 $2");
+    bool exactInFile = regex_search(removeOutFile, regexResult1, regex(" ([^- ]\\S+) "));
 
     if (!exactInFile) {
         cerr << "open fail";
@@ -50,5 +50,6 @@ void readArg(int argc, char **argv, bool &print, string &inFileName, string &out
     if (exactOutFile)
         outFileName = regexResult2[1];
     else
-        outFileName = regex_replace(inFileName + ".", regex("(.*?)\\..*"), "$1.html");
+        outFileName = regex_replace(inFileName, regex("(.+)\\..*"), "$1") + ".html";
+    // re.sub(r'(.+)\..*', r'\1', inputFileName) + '.html'
 }

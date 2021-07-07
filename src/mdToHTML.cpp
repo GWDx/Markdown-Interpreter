@@ -15,6 +15,8 @@ int main(int argc, char **argv) {
     bool print;
     string inFileName, outFileName;
     readArg(argc, argv, print, inFileName, outFileName);
+    cout << inFileName << '\n';
+    cout << outFileName << '\n';
     std::ifstream inFile;
     std::stringstream buffer;
     inFile.open(inFileName);
