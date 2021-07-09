@@ -1,8 +1,13 @@
+#include <regex>
+
 #include "filter.h"
+
+using std::regex;
+using std::regex_replace;
 
 string wordFilter(string line) {
     string ans1 = linkReplace(imageReplace(line));
-    string ans2 = strikethroughReplace(boldItalicReplace(ans1));
+    string ans2 = formatReplace(ans1);
     return ans2;
 }
 
@@ -19,15 +24,12 @@ string linkReplace(string line) {
     return ans2;
 }
 
-string boldItalicReplace(string line) {
+string formatReplace(string line) {
     // re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', line)
     string ans1 = regex_replace(line, regex("\\*\\*\\*(.+?)\\*\\*\\*"), "<b><i>$1</i></b>");
     string ans2 = regex_replace(ans1, regex("\\*\\*(.+?)\\*\\*"), "<b>$1</b>");
     string ans3 = regex_replace(ans2, regex("\\*(.+?)\\*"), "<i>$1</i>");
-    return ans3;
+    string ans4 = regex_replace(line, regex("~~(.+?)~~"), "<del>$1</del>");
+    return ans4;
 }
 
-string strikethroughReplace(string line) {
-    string ans = regex_replace(line, regex("~~(.+?)~~"), "<del>$1</del>");
-    return ans;
-}

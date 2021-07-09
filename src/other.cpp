@@ -1,9 +1,12 @@
 #include <iostream>
+#include <regex>
 
 #include "filter.h"
 
 using std::cerr;
 using std::cout;
+using std::regex;
+using std::regex_replace;
 using std::smatch;
 using std::sregex_token_iterator;
 
@@ -13,12 +16,22 @@ string htmlBodyAppend(string all) {
     return ans;
 }
 
-vector<string> split(string all) {
-    // ans = re.findall(r'<(?:pre|ul|blockquote)>[\s\S]*?<\/(?:pre|ul|blockquote)>|\n|.+', replaced)
-    regex r1("<(pre|ul|blockquote)>[\\s\\S]*?<\\/\\1>|.+");
-    vector<string> ans(sregex_token_iterator(all.begin(), all.end(), r1, 0), sregex_token_iterator());
-    return ans;
+vector<string> split(string all, regex re) {
+    vector<string> parts(sregex_token_iterator(all.begin(), all.end(), re, -1), sregex_token_iterator());
+    return parts;
 }
+
+vector<string> findall(string all, regex re) {
+    vector<string> parts(sregex_token_iterator(all.begin(), all.end(), re, 0), sregex_token_iterator());
+    return parts;
+}
+
+// vector<string> split(string all) {
+//     // ans = re.findall(r'<(?:pre|ul|blockquote)>[\s\S]*?<\/(?:pre|ul|blockquote)>|\n|.+', replaced)
+//     regex r1("<(pre|ul|blockquote)>[\\s\\S]*?<\\/\\1>|.+");
+//     vector<string> ans(sregex_token_iterator(all.begin(), all.end(), r1, 0), sregex_token_iterator());
+//     return ans;
+// }
 
 void readArg(int argc, char **argv, bool &print, string &inFileName, string &outFileName) { // ? simplify
     string arg = " ";
@@ -50,6 +63,5 @@ void readArg(int argc, char **argv, bool &print, string &inFileName, string &out
     if (exactOutFile)
         outFileName = regexResult2[1];
     else
-        outFileName = regex_replace(inFileName, regex("(.+)\\..*"), "$1") + ".html";
-    // re.sub(r'(.+)\..*', r'\1', inputFileName) + '.html'
+        outFileName = regex_replace(inFileName, regex("(.+)\\.(?!html$).*"), "$1") + ".html";
 }

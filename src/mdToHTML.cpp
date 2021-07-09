@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -8,8 +9,34 @@
 
 using std::cerr;
 using std::cout;
+using std::regex_replace;
 using std::string;
 using std::vector;
+
+string transform(string raw) {
+    string add;
+    string add2;
+    string ans = "";
+    vector<string> codeParts = codeReplaceSplit("\n" + raw);
+    for (auto &&codePart : codeParts) {
+        string trans = regex_replace(codePart, regex("<"), "<|");
+        if (codePart.find("<pre>") == 0)
+            add = trans;
+        else {
+            add = "";
+            vector<string> tableParts = tableReplaceSplit(trans);
+            for (auto &&tablePart : tableParts) {
+                if (tablePart.find("<figure>") == 0)
+                    add += tablePart;
+                else
+                    add += wordFilter(blockFilter(tablePart));
+            }
+        }
+        ans += regex_replace(add, regex("<\\|"), "<");
+    }
+    string out = htmlBodyAppend(ans);
+    return out;
+}
 
 int main(int argc, char **argv) {
     bool print;
@@ -28,19 +55,7 @@ int main(int argc, char **argv) {
     inFile.close();
     string raw = buffer.str();
 
-    vector<string> lines = split(blockFilter(raw));
-    string ans = "";
-    string add;
-    for (auto &&line : lines) {
-        if (line.find("<pre>") == 0 || line == "")
-            add = line;
-        else if (line.find("<ul>") == 0 || line.find("<blockquote>") == 0)
-            add = wordFilter(line);
-        else
-            add = lineFilter(wordFilter(line));
-        ans = ans + add + "\n";
-    }
-    string out = htmlBodyAppend(ans);
+    string out = transform(raw);
 
     if (print)
         cout << out;

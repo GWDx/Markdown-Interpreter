@@ -1,7 +1,7 @@
 import tkinter
 from tkinter.messagebox import showerror
-from tkinter import Label, Button, Entry, Checkbutton, StringVar, IntVar
 from tkinter.filedialog import askopenfilename
+from tkinter import Label, Button, Entry, Checkbutton, StringVar, IntVar
 
 import re
 import json
@@ -35,15 +35,15 @@ def main():
 
         def changeSave():
             nonlocal save
-            save = not save
+            save = 1 - save
 
         def submit():
             nonlocal userName, password
             userName = userNameEntry.get()
             password = passwordEntry.get()
             if save == 1:
-                writeContent = json.dumps({'userName': userName, 'password': password})
                 writeSaveFile = open('config.json', 'w')
+                writeContent = json.dumps({'userName': userName, 'password': password})
                 writeSaveFile.write(writeContent)
                 writeSaveFile.close()
 
@@ -57,11 +57,15 @@ def main():
         second.geometry('400x300')
         second.title('登录 FTP')
 
+        userNameVar = StringVar(value=userName)
+        passwordVar = StringVar(value=password)
+        saveVar = IntVar(value=save)
+
         userNameLabel = Label(second, text='用户名')
         passwordLabel = Label(second, text='密码')
-        userNameEntry = Entry(second, textvariable=StringVar(value=userName), width=30)
-        passwordEntry = Entry(second, textvariable=StringVar(value=password), width=30)
-        saveCheckbutton = Checkbutton(second, text='保存', variable=IntVar(value=save), command=changeSave)
+        userNameEntry = Entry(second, textvariable=userNameVar, width=30)
+        passwordEntry = Entry(second, textvariable=passwordVar, width=30)
+        saveCheckbutton = Checkbutton(second, text='保存', variable=saveVar, command=changeSave)
         submitButton = Button(second, text='提交', command=submit)
 
         userNameLabel.place(x=40, y=60)
@@ -70,8 +74,6 @@ def main():
         passwordEntry.place(x=130, y=100)
         saveCheckbutton.place(x=100, y=140)
         submitButton.place(x=200, y=140)
-
-        second.mainloop()
 
     try:
         readSaveFile = open('config.json', 'r')
@@ -88,7 +90,7 @@ def main():
 
     first = tkinter.Tk()
     first.geometry('480x320')
-    first.title('mdToHTML GUI')
+    first.title('mdToHTMLGUI')
 
     panel = tkinter.Frame(first)
     selectInputButton = Button(panel, text='选择文件', command=selectInput, font='宋体 -20')
