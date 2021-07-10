@@ -2,7 +2,7 @@ compiler = g++ -g -Wall -std=c++11
 
 all: bin/mdToHTML.exe bin/mdToHTMLGUI.exe
 
-bin/mdToHTML.exe: bin/mdToHTML.o bin/blockFilter.o bin/lineFilter.o bin/wordFilter.o bin/other.o
+bin/mdToHTML.exe: bin/mdToHTML.o bin/blockFilter.o bin/lineFilter.o bin/wordFilter.o bin/other.o bin/replaceSplit.o
 	${compiler} -o $@ $^
 
 bin/%.o: src/%.cpp src/filter.h

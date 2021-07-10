@@ -1,7 +1,7 @@
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <regex>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -13,26 +13,26 @@ using std::regex_replace;
 using std::string;
 using std::vector;
 
-string transform(string raw) {
+string mdToHTML(string raw) {
     string add;
     string add2;
     string ans = "";
-    vector<string> codeParts = codeReplaceSplit("\n" + raw);
+    string transferred = regex_replace("\n" + raw, regex("<"), "<+");
+    vector<string> codeParts = codeReplaceSplit(transferred);
     for (auto &&codePart : codeParts) {
-        string trans = regex_replace(codePart, regex("<"), "<|");
         if (codePart.find("<pre>") == 0)
-            add = trans;
+            add = codePart;                                     // 代码块
         else {
             add = "";
-            vector<string> tableParts = tableReplaceSplit(trans);
+            vector<string> tableParts = tableReplaceSplit(codePart);
             for (auto &&tablePart : tableParts) {
                 if (tablePart.find("<figure>") == 0)
-                    add += tablePart;
+                    add += wordFilter(tablePart);               // 表格
                 else
-                    add += wordFilter(blockFilter(tablePart));
+                    add += wordFilter(blockFilter(tablePart));  // 非代码块非表格
             }
         }
-        ans += regex_replace(add, regex("<\\|"), "<");
+        ans += regex_replace(add, regex("<\\+"), "<");
     }
     string out = htmlBodyAppend(ans);
     return out;
@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
     bool print;
     string inFileName, outFileName;
     readArg(argc, argv, print, inFileName, outFileName);
+
     cout << inFileName << '\n';
     cout << outFileName << '\n';
     std::ifstream inFile;
@@ -55,7 +56,7 @@ int main(int argc, char **argv) {
     inFile.close();
     string raw = buffer.str();
 
-    string out = transform(raw);
+    string out = mdToHTML(raw);
 
     if (print)
         cout << out;

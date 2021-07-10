@@ -1,9 +1,4 @@
-#include <regex>
-
 #include "filter.h"
-
-using std::regex;
-using std::regex_replace;
 
 string lineFilter(string line) {
     string result = headReplace(line);
@@ -15,7 +10,7 @@ string lineFilter(string line) {
 string headReplace(string line) {
     // re.match(r'^(#{1,6}) (.*)', line)
     std::smatch result;
-    bool matched = std::regex_match(line, result, regex("[ \\t]*(#{1,6}) (.+)"));
+    bool matched = std::regex_match(line, result, regex(" *(#{1,6}) (.+)"));
     if (!matched)
         return "";
     string length = std::to_string(result[1].length());
