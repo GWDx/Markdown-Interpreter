@@ -22,7 +22,7 @@ vector<string> regexFindall(string all, regex re) {
     return parts;
 }
 
-void readArg(int argc, char **argv, bool &print, string &inFileName, string &outFileName) { // ? simplify
+void readArg(int argc, char **argv, bool &print, string &inFileName, string &outFileName) {
     string arg = " ";
     for (int i = 1; i < argc; i++) {
         string temp(argv[i]);

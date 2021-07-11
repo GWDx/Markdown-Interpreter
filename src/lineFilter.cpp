@@ -8,7 +8,6 @@ string lineFilter(string line) {
 }
 
 string headReplace(string line) {
-    // re.match(r'^(#{1,6}) (.*)', line)
     std::smatch result;
     bool matched = std::regex_match(line, result, regex(" *(#{1,6}) (.+)"));
     if (!matched)

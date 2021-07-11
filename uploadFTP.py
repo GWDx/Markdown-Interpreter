@@ -2,6 +2,7 @@ import ftplib
 import re
 
 
+# 登录 FTP 并上传本地文件
 def uploadFTP(userName, password, localFileName):
     host = 'home.ustc.edu.cn'
     ftp = ftplib.FTP(host, encoding='gbk')
